@@ -10,3 +10,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body, footer {
+    background-color: #fff6e3;
+    /* background-image: url('./assets/bg.png'); */
+}

@@ -1,0 +1,1 @@
+receipt: https://tailwindcomponents.com/component/receipt-1

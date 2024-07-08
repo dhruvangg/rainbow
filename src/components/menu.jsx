@@ -1,7 +1,5 @@
 export const menu = [{
   category: 'American Thickshake',
-  image: './assets/falooda.png',
-  color: '#751daa',
   items: [
     { name: "Vanilla", rate: [{ price: 90, qty: '250ml' }] },
     { name: "Strawberry", rate: [{ price: 90, qty: '250ml' }] },
