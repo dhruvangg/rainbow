@@ -18,6 +18,8 @@ const menu = [{
 export default function Footer() {
     const cart = useSelector((state) => state.cart.products);
     const count = cart.reduce((acc, item) => acc + item.qty, 0)
+
+    console.log({cart});
     return (
         <footer className="sticky bottom-0 border-t z-10 bg-white">
             <nav>

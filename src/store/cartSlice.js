@@ -17,13 +17,33 @@ const cartSlice = createSlice({
             }
         },
         removeProduct: (state, action) => {
-            const index = state.products.findIndex((product) => product.name === action.payload.name);
+            const index = state.products.findIndex((product) => product.id === action.payload.id);
             if (index !== -1) {
                 state.products.splice(index, 1);
             }
         },
+
+        addProductQty: (state, action) => {
+            const product = state.products.find((product) => product.id === action.payload.id);
+            if (product) {
+                product.qty += 1;
+            }
+        },
+        removeProductQty: (state, action) => {
+            const product = state.products.find((product) => product.id === action.payload.id);
+            if (product) {
+                if (product.qty >= 2) {
+                    product.qty -= 1;
+                } else {
+                    const index = state.products.findIndex((product) => product.id === action.payload.id);
+                    if (index !== -1) {
+                        state.products.splice(index, 1);
+                    }
+                }
+            }
+        },
         updateProductQty: (state, action) => {
-            const product = state.products.find((product) => product.name === action.payload.name);
+            const product = state.products.find((product) => product.id === action.payload.id);
             if (product) {
                 product.qty = action.payload.qty;
             }
@@ -31,5 +51,5 @@ const cartSlice = createSlice({
     },
 });
 
-export const { addProduct, removeProduct, updateProductQty } = cartSlice.actions;
+export const { addProduct, removeProduct, updateProductQty, addProductQty, removeProductQty } = cartSlice.actions;
 export default cartSlice.reducer;

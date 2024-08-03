@@ -1,25 +1,38 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { removeProduct, updateProductQty } from '../store/cartSlice';
+import { removeProduct, addProductQty, removeProductQty } from '../store/cartSlice';
+import { Link } from 'react-router-dom';
+import { formatRupee } from '../store/utils';
 
 export default function Cart() {
     const cart = useSelector((state) => state.cart.products);
     const dispatch = useDispatch();
 
-    const handleRemoveProduct = (productName) => {
-        dispatch(removeProduct({ name: productName }));
+    const handleRemoveProduct = (id) => {
+        dispatch(removeProduct({ id }));
     };
 
-    const handleUpdateQty = (productName, qty) => {
-        dispatch(updateProductQty({ name: productName, qty }));
+    const handleRemoveQty = (id) => {
+        dispatch(removeProductQty({ id }));
     };
-
+    const handleAddQty = (id) => {
+        dispatch(addProductQty({ id }));
+    };
 
     const groupedCart = cart.reduce((acc, item) => {
         (acc[item.category] = acc[item.category] || []).push(item);
         return acc;
     }, {})
 
-    console.log(groupedCart);
+    if (cart.length === 0) {
+        return <section>
+            <div className="w-full max-w-7xl px-4 md:px-5 lg-6 mx-auto text-center font-semibold text-lg my-4">
+                <h4 className='mb-4'>You do not have anything in your cart.</h4>
+                <Link className='text-blue-700 underline' to={'/'}>Back to Menu</Link>
+            </div>
+        </section>
+    }
+
+    const subTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0)
 
     return (
         <section>
@@ -34,7 +47,7 @@ export default function Cart() {
                                     <div key={id} className="col-span-12 lg:col-span-10 detail w-full lg:pl-3">
                                         <div className="flex items-center justify-between w-full">
                                             <h5 className="font-semibold text-lg text-gray-900">{name}</h5>
-                                            <button className="rounded-full group flex items-center justify-center focus-within:outline-red-500" onClick={handleRemoveProduct()}>
+                                            <button className="rounded-full group flex items-center justify-center focus-within:outline-red-500" onClick={() => handleRemoveProduct(id)}>
                                                 <svg width="34" height="34" viewBox="0 0 34 34" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <circle className="fill-red-50 transition-all duration-500 group-hover:fill-red-400"
@@ -49,7 +62,7 @@ export default function Cart() {
                                         <div className="flex justify-between items-center">
                                             <div className="flex items-center gap-4">
                                                 <button
-                                                    onClick={() => console.log()}
+                                                    onClick={() => handleRemoveQty(id)}
                                                     className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
                                                     <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M4.5 9.5H13.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -59,13 +72,14 @@ export default function Cart() {
                                                     className="border border-gray-200 rounded-full w-10 aspect-square outline-none font-semibold text-sm py-1 px-2 text-center select-none"
                                                     value={qty} readOnly />
                                                 <button
+                                                    onClick={() => handleAddQty(id)}
                                                     className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
                                                     <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path d="M3.75 9.5H14.25M9 14.75V4.25" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                                                     </svg>
                                                 </button>
                                             </div>
-                                            <h6 className="text-indigo-600 font-bold text-right">${price*qty}</h6>
+                                            <h6 className="text-indigo-600 font-bold text-right">{formatRupee(price * qty)}</h6>
                                         </div>
                                     </div>
                                 )
@@ -73,123 +87,9 @@ export default function Cart() {
                         </div>
                     )
                 })}
-                <div className="border p-4 lg:p-8 grid grid-cols-12 mb-4 max-lg:max-w-lg max-lg:mx-auto gap-y-4">
-                    <div className='text-xl font-bold col-span-12'>Special Falooda</div>
-                    <div className="col-span-12 lg:col-span-10 detail w-full lg:pl-3">
-                        <div className="flex items-center justify-between w-full">
-                            <h5 className="font-semibold text-lg text-gray-900">Black Current Falooda</h5>
-                            <button className="rounded-full group flex items-center justify-center focus-within:outline-red-500">
-                                <svg width="34" height="34" viewBox="0 0 34 34" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <circle className="fill-red-50 transition-all duration-500 group-hover:fill-red-400"
-                                        cx="17" cy="17" r="17" fill="" />
-                                    <path className="stroke-red-500 transition-all duration-500 group-hover:strokeWhite"
-                                        d="M14.1673 13.5997V12.5923C14.1673 11.8968 14.7311 11.333 15.4266 11.333H18.5747C19.2702 11.333 19.834 11.8968 19.834 12.5923V13.5997M19.834 13.5997C19.834 13.5997 14.6534 13.5997 11.334 13.5997C6.90804 13.5998 27.0933 13.5998 22.6673 13.5997C21.5608 13.5997 19.834 13.5997 19.834 13.5997ZM12.4673 13.5997H21.534V18.8886C21.534 20.6695 21.534 21.5599 20.9807 22.1131C20.4275 22.6664 19.5371 22.6664 17.7562 22.6664H16.2451C14.4642 22.6664 13.5738 22.6664 13.0206 22.1131C12.4673 21.5599 12.4673 20.6695 12.4673 18.8886V13.5997Z"
-                                        stroke="#EF4444" strokeWidth="1.6" strokeLinecap="round" />
-                                </svg>
-                            </button>
-                        </div>
-                        <p className="mb-2 text-xs">(300ml)</p>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4.5 9.5H13.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                                <input type="text" id="number"
-                                    className="border border-gray-200 rounded-full w-10 aspect-square outline-none font-semibold text-sm py-1 px-2 text-center select-none"
-                                    value={2} readOnly />
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3.75 9.5H14.25M9 14.75V4.25" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <h6 className="text-indigo-600 font-bold text-right">$220</h6>
-                        </div>
-                    </div>
-                    <div className="col-span-12 lg:col-span-10 detail w-full lg:pl-3">
-                        <div className="flex items-center justify-between w-full">
-                            <h5 className="font-semibold text-lg text-gray-900">Black Current Falooda</h5>
-                            <button className="rounded-full group flex items-center justify-center focus-within:outline-red-500">
-                                <svg width="34" height="34" viewBox="0 0 34 34" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <circle className="fill-red-50 transition-all duration-500 group-hover:fill-red-400"
-                                        cx="17" cy="17" r="17" fill="" />
-                                    <path className="stroke-red-500 transition-all duration-500 group-hover:strokeWhite"
-                                        d="M14.1673 13.5997V12.5923C14.1673 11.8968 14.7311 11.333 15.4266 11.333H18.5747C19.2702 11.333 19.834 11.8968 19.834 12.5923V13.5997M19.834 13.5997C19.834 13.5997 14.6534 13.5997 11.334 13.5997C6.90804 13.5998 27.0933 13.5998 22.6673 13.5997C21.5608 13.5997 19.834 13.5997 19.834 13.5997ZM12.4673 13.5997H21.534V18.8886C21.534 20.6695 21.534 21.5599 20.9807 22.1131C20.4275 22.6664 19.5371 22.6664 17.7562 22.6664H16.2451C14.4642 22.6664 13.5738 22.6664 13.0206 22.1131C12.4673 21.5599 12.4673 20.6695 12.4673 18.8886V13.5997Z"
-                                        stroke="#EF4444" strokeWidth="1.6" strokeLinecap="round" />
-                                </svg>
-                            </button>
-                        </div>
-                        <p className="mb-2 text-xs">(300ml)</p>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4.5 9.5H13.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                                <input type="text" id="number"
-                                    className="border border-gray-200 rounded-full w-10 aspect-square outline-none font-semibold text-sm py-1 px-2 text-center select-none"
-                                    value={2} readOnly />
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3.75 9.5H14.25M9 14.75V4.25" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <h6 className="text-indigo-600 font-bold text-right">$220</h6>
-                        </div>
-                    </div>
-                </div>
-                <div className="border p-4 lg:p-8 grid grid-cols-12 mb-4 max-lg:max-w-lg max-lg:mx-auto gap-y-4">
-                    <div className='text-xl font-bold col-span-12'>Fresh Juice</div>
-                    <div className="col-span-12 lg:col-span-10 detail w-full lg:pl-3">
-                        <div className="flex items-center justify-between w-full">
-                            <h5 className="font-semibold text-lg text-gray-900">Jambu</h5>
-                            <button className="rounded-full group flex items-center justify-center focus-within:outline-red-500">
-                                <svg width="34" height="34" viewBox="0 0 34 34" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <circle className="fill-red-50 transition-all duration-500 group-hover:fill-red-400"
-                                        cx="17" cy="17" r="17" fill="" />
-                                    <path className="stroke-red-500 transition-all duration-500 group-hover:strokeWhite"
-                                        d="M14.1673 13.5997V12.5923C14.1673 11.8968 14.7311 11.333 15.4266 11.333H18.5747C19.2702 11.333 19.834 11.8968 19.834 12.5923V13.5997M19.834 13.5997C19.834 13.5997 14.6534 13.5997 11.334 13.5997C6.90804 13.5998 27.0933 13.5998 22.6673 13.5997C21.5608 13.5997 19.834 13.5997 19.834 13.5997ZM12.4673 13.5997H21.534V18.8886C21.534 20.6695 21.534 21.5599 20.9807 22.1131C20.4275 22.6664 19.5371 22.6664 17.7562 22.6664H16.2451C14.4642 22.6664 13.5738 22.6664 13.0206 22.1131C12.4673 21.5599 12.4673 20.6695 12.4673 18.8886V13.5997Z"
-                                        stroke="#EF4444" strokeWidth="1.6" strokeLinecap="round" />
-                                </svg>
-                            </button>
-                        </div>
-                        <p className="mb-2 text-xs">(300ml)</p>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4.5 9.5H13.5" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                                <input type="text" id="number"
-                                    className="border border-gray-200 rounded-full w-10 aspect-square outline-none font-semibold text-sm py-1 px-2 text-center select-none"
-                                    value={2} readOnly />
-                                <button
-                                    className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
-                                    <svg className="stroke-black" width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3.75 9.5H14.25M9 14.75V4.25" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <h6 className="text-indigo-600 font-bold text-right">$220</h6>
-                        </div>
-                    </div>
-                </div>
                 <div className="flex flex-row font-bold text-xl py-4">
                     <h5 className="flex-1">Subtotal</h5>
-                    <h6 className="flex-1 text-indigo-600 text-right">$440</h6>
+                    <h6 className="flex-1 text-indigo-600 text-right">{formatRupee(subTotal)}</h6>
                 </div>
                 <a href="https://wa.me/8155896243?text=I'm%20interested%20in%20your%20car%0afor%20sale" className="flex justify-center items-center py-4 px-6 bg-indigo-600 text-white font-semibold text-lg w-full text-center transition-all duration-500 hover:bg-indigo-700 ">
                     <span>Order on &nbsp;</span>
