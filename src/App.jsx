@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/rainbow">
       <main className="flex flex-col min-h-screen max-w-screen-md mx-auto shadow-lg">
         <header className="sticky p-2 top-0 flex justify-center border-b z-10 bg-white">
           <img width={200} src={Logo} alt="logo" />
