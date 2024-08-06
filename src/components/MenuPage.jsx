@@ -4,10 +4,7 @@ import { useDispatch } from 'react-redux';
 import { addProduct } from '../store/cartSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-function formatRupee(val) {
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(val)
-}
+import { formatRupee } from '../store/utils';
 
 export default function MenuPage() {
     const [activeCategory, setActiveCategory] = useState(Categories[0])
@@ -33,14 +30,14 @@ export default function MenuPage() {
                 {Categories.map(category => <option key={category} value={category}>{category}</option>)}
             </select>
             <div>
-                {filteredItems.map(({ id, name, category, rate, notes }) => {
+                {filteredItems.map(({ name, category, rate, notes }) => {
                     return <li key={name} className={`grid grid grid-cols-2 gap-4 p-2 mb-5 border-b last:border-none`}>
                         <div className="flex items-center">
                             <div className="font-bold">{name}</div>
                             <div className="text-gray-600 text-xs">{notes}</div>
                         </div>
                         <div className="text-right flex flex-col">
-                            {rate.map(({ price, size }, i) => <div key={i} className="flex items-center justify-between mb-2">
+                            {rate.map(({ id, price, size }, i) => <div key={i} className="flex items-center justify-between mb-2">
                                 <div className="text-xs text-gray-500">{size}</div>
                                 <div className="text-md font-semibold flex justify-end">{formatRupee(price)}</div>
                                 <button className="text-xs bg-blue-500 text-white p-2 mt-1" onClick={() => handleAddProduct({ id, name, category, price, size, qty: 1 })}>
